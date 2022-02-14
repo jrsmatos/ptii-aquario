@@ -1,0 +1,1 @@
+build/default/debug\fish.d build/default/debug\fish.p1: fish.c fish.h

@@ -1,0 +1,154 @@
+Version 3.2 HI-TECH Software Intermediate Code
+[s S1 `*uc 1 `f 1 `f 1 `f 1 `uc 1 ]
+[n S1 . name min_ph max_ph average_temperature identifier ]
+[; ;fish.h: 4: typedef struct {
+[; ;fish.h: 5: char *name;
+[; ;fish.h: 6: float min_ph;
+[; ;fish.h: 7: float max_ph;
+[; ;fish.h: 8: float average_temperature;
+[; ;fish.h: 9: char identifier;
+[; ;fish.h: 10: } FishParams;
+[; ;fish.h: 12: FishParams set_current_fish(FishParams *fish, char identifier);
+"3 fish.c
+[v _set_current_fish `(S1 ~T0 1 ef2`*S1`uc ]
+{
+[; ;fish.c: 3: FishParams set_current_fish(FishParams *fish, char identifier) {
+[e :U _set_current_fish ]
+[v _fish `*S1 ~T0 1 r1 ]
+[v _identifier `uc ~T0 1 r2 ]
+[f ]
+[; ;fish.c: 4: switch (identifier) {
+"4
+[e $U 4  ]
+{
+[; ;fish.c: 5: case 1:
+"5
+[e :U 5 ]
+[; ;fish.c: 6: fish->identifier = identifier;
+"6
+[e = . *U _fish 4 _identifier ]
+[; ;fish.c: 7: fish->max_ph = 8;
+"7
+[e = . *U _fish 2 -> -> 8 `i `f ]
+[; ;fish.c: 8: fish->min_ph = 6;
+"8
+[e = . *U _fish 1 -> -> 6 `i `f ]
+[; ;fish.c: 9: fish->average_temperature = 23.5;
+"9
+[e = . *U _fish 3 -> .23.5 `f ]
+[; ;fish.c: 10: break;
+"10
+[e $U 3  ]
+[; ;fish.c: 12: case 2:
+"12
+[e :U 6 ]
+[; ;fish.c: 13: fish->identifier = identifier;
+"13
+[e = . *U _fish 4 _identifier ]
+[; ;fish.c: 14: fish->max_ph = 8;
+"14
+[e = . *U _fish 2 -> -> 8 `i `f ]
+[; ;fish.c: 15: fish->min_ph = 6.5;
+"15
+[e = . *U _fish 1 -> .6.5 `f ]
+[; ;fish.c: 16: fish->average_temperature = 25;
+"16
+[e = . *U _fish 3 -> -> 25 `i `f ]
+[; ;fish.c: 17: break;
+"17
+[e $U 3  ]
+[; ;fish.c: 19: case 3:
+"19
+[e :U 7 ]
+[; ;fish.c: 20: fish->identifier = identifier;
+"20
+[e = . *U _fish 4 _identifier ]
+[; ;fish.c: 21: fish->max_ph = 7.8;
+"21
+[e = . *U _fish 2 -> .7.8 `f ]
+[; ;fish.c: 22: fish->min_ph = 5.5;
+"22
+[e = . *U _fish 1 -> .5.5 `f ]
+[; ;fish.c: 23: fish->average_temperature = 26;
+"23
+[e = . *U _fish 3 -> -> 26 `i `f ]
+[; ;fish.c: 24: break;
+"24
+[e $U 3  ]
+[; ;fish.c: 26: case 4:
+"26
+[e :U 8 ]
+[; ;fish.c: 27: fish->identifier = identifier;
+"27
+[e = . *U _fish 4 _identifier ]
+[; ;fish.c: 28: fish->max_ph = 8.5;
+"28
+[e = . *U _fish 2 -> .8.5 `f ]
+[; ;fish.c: 29: fish->min_ph = 6.5;
+"29
+[e = . *U _fish 1 -> .6.5 `f ]
+[; ;fish.c: 30: fish->average_temperature = 27.5;
+"30
+[e = . *U _fish 3 -> .27.5 `f ]
+[; ;fish.c: 31: break;
+"31
+[e $U 3  ]
+[; ;fish.c: 33: case 5:
+"33
+[e :U 9 ]
+[; ;fish.c: 34: fish->identifier = identifier;
+"34
+[e = . *U _fish 4 _identifier ]
+[; ;fish.c: 35: fish->max_ph = 7.9;
+"35
+[e = . *U _fish 2 -> .7.9 `f ]
+[; ;fish.c: 36: fish->min_ph = 6;
+"36
+[e = . *U _fish 1 -> -> 6 `i `f ]
+[; ;fish.c: 37: fish->average_temperature = 23;
+"37
+[e = . *U _fish 3 -> -> 23 `i `f ]
+[; ;fish.c: 38: break;
+"38
+[e $U 3  ]
+[; ;fish.c: 40: case 6:
+"40
+[e :U 10 ]
+[; ;fish.c: 41: fish->identifier = identifier;
+"41
+[e = . *U _fish 4 _identifier ]
+[; ;fish.c: 42: fish->max_ph = 7;
+"42
+[e = . *U _fish 2 -> -> 7 `i `f ]
+[; ;fish.c: 43: fish->min_ph = 6;
+"43
+[e = . *U _fish 1 -> -> 6 `i `f ]
+[; ;fish.c: 44: fish->average_temperature = 30;
+"44
+[e = . *U _fish 3 -> -> 30 `i `f ]
+[; ;fish.c: 45: break;
+"45
+[e $U 3  ]
+"46
+}
+[; ;fish.c: 46: }
+[e $U 3  ]
+"4
+[e :U 4 ]
+[e [\ _identifier , $ -> -> 1 `i `uc 5
+ , $ -> -> 2 `i `uc 6
+ , $ -> -> 3 `i `uc 7
+ , $ -> -> 4 `i `uc 8
+ , $ -> -> 5 `i `uc 9
+ , $ -> -> 6 `i `uc 10
+ 3 ]
+"46
+[e :U 3 ]
+[; ;fish.c: 47: return *fish;
+"47
+[e ) *U _fish ]
+[e $UE 2  ]
+[; ;fish.c: 48: }
+"48
+[e :UE 2 ]
+}
