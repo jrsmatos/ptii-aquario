@@ -33,9 +33,9 @@
 #define STATE_CIRCULATION 4     // Machine state circulating and monitoring aquarium
 
 #define COMMAND_START_MACHINE   0b00110001     // Starts machine command
-#define COMMAND_START_DRAINNING 0b00110010   // Drain aquarium command
+#define COMMAND_START_DRAINNING 0b00110010     // Drain aquarium command
 #define COMMAND_START_FILLING   0b00110011     // Fill aquarium command
-#define COMMAND_STOP_MACHINE    0b00110100      // Stops machine
+#define COMMAND_STOP_MACHINE    0b00110100     // Stops machine
 #define COMMAND_CHANGE_FISH_1   0b00110101     // Change fish command (Magikarp)
 #define COMMAND_CHANGE_FISH_2   0b00110110     // Change fish command (Tubarao)
 #define COMMAND_CHANGE_FISH_3   0b00110111     // Change fish command (Caracol)
