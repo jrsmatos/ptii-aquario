@@ -7141,45 +7141,31 @@ Version 3.2 HI-TECH Software Intermediate Code
 [v _fish `uc ~T0 1 r2 ]
 [v _temperature `f ~T0 1 r3 ]
 [f ]
-"12
-[v _sys_state `uc ~T0 1 a ]
-[; ;io.c: 12: char sys_state = 0;
-[e = _sys_state -> -> 0 `i `uc ]
-[; ;io.c: 13: sys_state = PORTB;
-"13
-[e = _sys_state _PORTB ]
-"15
-[v _sys_state_2 `uc ~T0 1 a ]
-[; ;io.c: 15: char sys_state_2 = 0;
-[e = _sys_state_2 -> -> 0 `i `uc ]
-[; ;io.c: 16: sys_state_2 = PORTA;
-"16
-[e = _sys_state_2 _PORTA ]
-[; ;io.c: 18: putch(machine_state);
-"18
+[; ;io.c: 11: putch(machine_state);
+"11
 [e ( _putch (1 _machine_state ]
-[; ;io.c: 19: putch(sys_state);
-"19
-[e ( _putch (1 _sys_state ]
-[; ;io.c: 20: putch(sys_state_2);
-"20
-[e ( _putch (1 _sys_state_2 ]
-[; ;io.c: 21: putch(99);
-"21
+[; ;io.c: 12: putch(PORTB);
+"12
+[e ( _putch (1 _PORTB ]
+[; ;io.c: 13: putch(PORTA);
+"13
+[e ( _putch (1 _PORTA ]
+[; ;io.c: 14: putch(99);
+"14
 [e ( _putch (1 -> -> 99 `i `uc ]
-[; ;io.c: 22: putch((int)(temperature*10)/10);
-"22
+[; ;io.c: 15: putch((int)(temperature*10)/10);
+"15
 [e ( _putch (1 -> / -> * _temperature -> -> 10 `i `f `i -> 10 `i `uc ]
-[; ;io.c: 23: putch((int)(temperature*10)%10);
-"23
+[; ;io.c: 16: putch((int)(temperature*10)%10);
+"16
 [e ( _putch (1 -> % -> * _temperature -> -> 10 `i `f `i -> 10 `i `uc ]
-[; ;io.c: 24: putch(fish);
-"24
+[; ;io.c: 17: putch(fish);
+"17
 [e ( _putch (1 _fish ]
-[; ;io.c: 25: putch('\n');
-"25
+[; ;io.c: 18: putch('\n');
+"18
 [e ( _putch (1 -> -> 10 `ui `uc ]
-[; ;io.c: 26: }
-"26
+[; ;io.c: 19: }
+"19
 [e :UE 1172 ]
 }

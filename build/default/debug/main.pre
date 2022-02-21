@@ -9121,7 +9121,7 @@ FishParams set_current_fish(FishParams *fish, char identifier);
 void putch(unsigned char c);
 void send_sys_data(char machine_state, char fish, float temperature);
 
-# 56 "main.c"
+# 58 "main.c"
 __config("__CONFIG", "pic18", "FOSC_HSHP & PLLCFG_OFF & PRICLKEN_ON & FCMEN_OFF & IESO_OFF");
 
 __config("__CONFIG", "pic18", "PWRTEN_OFF & BOREN_SBORDIS & BORV_190");
@@ -9146,33 +9146,49 @@ __config("__CONFIG", "pic18", "EBTRB_OFF");
 
 char RECEIVED_COMMAND = 0;
 
+
 void interrupt ISR() {
 if (RC1IF && RC1IE) {
-
 RECEIVED_COMMAND = RCREG1;
 }
 }
-int adc_capture(){
+void EEPROM_write(uint8_t adress, uint8_t value){
 
-ADCON0bits.GO = 1;
-while (ADCON0bits.GO == 1);
+EECON1bits.EEPGD = 0;
+EECON1bits.CFGS = 0;
+EECON1bits.WREN = 1;
 
-uint16_t code = 0x0000;
-code = ADRESH;
-code = code << 8;
-code = code | ADRESL;
+EEADR = adress;
+EEDATA = value;
 
-return code;
+INTCONbits.GIE = 0;
+
+EECON2 = 0x55;
+EECON2 = 0xAA;
+EECON1bits.WR = 1;
+
+INTCONbits.GIE = 1;
+
+EECON1bits.WREN =0;
+}
+uint8_t EEPROM_read(uint8_t adress){
+
+EEADR = adress;
+EECON1bits.EEPGD = 0;
+EECON1bits.CFGS = 0;
+RD = 1;
+
+return EEDATA;
 }
 void PORT_init(){
 
 TRISB = 0;
 LATB = 0;
-
-TRISA0 = 1;
-TRISA1 = 1;
-ANSA0 = 0;
-ANSA1 = 0;
+ANSB1 = 0;
+ANSB2 = 0;
+ANSB3 = 0;
+ANSB4 = 0;
+ANSB5 = 0;
 
 
 TRISC6 = 0;
@@ -9181,8 +9197,14 @@ ANSC7 = 0;
 
 
 ANSELA = 0;
+TRISA0 = 1;
+ANSA0 = 1;
+
+
 TRISA1 = 1;
-ANSA1 = 1;
+TRISA2 = 1;
+ANSA1 = 0;
+ANSA2 = 0;
 
 
 PEIE = 1;
@@ -9216,6 +9238,18 @@ ADCON2bits.ADCS = 0b010;
 ADCON0bits.ADON = 1;
 
 }
+uint16_t adc_capture(){
+
+ADCON0bits.GO = 1;
+while (ADCON0bits.GO == 1);
+
+uint16_t code = 0x0000;
+code = ADRESH;
+code = code << 8;
+code = code | ADRESL;
+
+return code;
+}
 float Temp_calc(float Rterm){
 float t = (pow((1./(float)298.16)+(1./(float)3493.0)*log((float)Rterm/(float)1000.0),(-1.)))-273.16;
 return t;
@@ -9248,23 +9282,101 @@ ADC_init();
 
 
 FishParams current_fish;
-set_current_fish(&current_fish, 2);
-
-char machine_state = 1;
-
+set_current_fish(&current_fish, EEPROM_read(0));
 
 float adc_capture_average;
 float Rterm;
 float Temp_measured;
 
+uint8_t last_fsm_state = 0;
+
+uint8_t fsm_state = EEPROM_read(0x10);
+if (fsm_state == 255)
+fsm_state = 0;
+
+int timer_preload = 55770;
+int t1_counter = 0;
+
+
+T0CONbits.TMR0ON = 1;
+T0CONbits.T08BIT = 0;
+T0CONbits.T0CS = 0;
+T0CONbits.PSA = 0;
+T0CONbits.T0PS = 0b111;
+TMR0H = (timer_preload >> 8 & 0xFF);
+TMR0L = (timer_preload & 0xFF);
+
+
+T1CONbits.TMR1CS = 0b00;
+T1CONbits.T1CKPS = 0b11;
+T1CONbits.T1RD16 = 1;
+T1CONbits.TMR1ON = 0;
+
 while (1){
 
 
 adc_capture_average = adc_average(200);
-Rterm = Rterm_calc('B', adc_capture_average);
+Rterm = Rterm_calc('A', adc_capture_average);
 Temp_measured = Temp_calc(Rterm);
 
-if (Temp_measured <= (current_fish.average_temperature - 2)){
+
+if (RECEIVED_COMMAND) {
+switch (RECEIVED_COMMAND) {
+
+case 0b00110101:
+set_current_fish(&current_fish, 6);
+EEPROM_write(0,'1');
+break;
+case 0b00110110:
+set_current_fish(&current_fish, 2);
+EEPROM_write(0,'2');
+break;
+case 0b00110111:
+set_current_fish(&current_fish, 1);
+EEPROM_write(0,'3');
+break;
+case 0b00111000:
+set_current_fish(&current_fish, 5);
+EEPROM_write(0,'4');
+break;
+case 0b00111001:
+set_current_fish(&current_fish, 4);
+EEPROM_write(0,'5');
+break;
+case 0b01000001:
+set_current_fish(&current_fish, 3);
+EEPROM_write(0,'6');
+break;
+}
+}
+
+
+switch(fsm_state){
+case 0:
+LATB1 = 0;
+LATB2 = 0;
+LATB3 = 0;
+LATB4 = 0;
+LATB5 = 0;
+if (RECEIVED_COMMAND == 0b00110001){
+fsm_state = 1;
+}
+if (RECEIVED_COMMAND == 0b00110010){
+fsm_state = 2;
+}
+if (RECEIVED_COMMAND == 0b00110011){
+fsm_state = 3;
+}
+break;
+
+case 1:
+LATB1 = 1;
+LATB2 = 0;
+LATB3 = 0;
+LATB4 = 1;
+LATB5 = 0;
+
+if ((Temp_measured <= (current_fish.average_temperature - 2)) && PORTAbits.RA1){
 LATB5 = 1;
 }
 else if(Temp_measured < current_fish.average_temperature){
@@ -9274,50 +9386,81 @@ else{
 LATB5 = 0;
 }
 
+if (RECEIVED_COMMAND == 0b00110100 || !PORTAbits.RA2){
+fsm_state = 0;
+} else if (RECEIVED_COMMAND == 0b00110011 && !PORTAbits.RA1){
+fsm_state = 3;
+} else if (RECEIVED_COMMAND == 0b00110010 && PORTAbits.RA2){
+fsm_state = 2;
+}
 
-if (RECEIVED_COMMAND) {
-switch (RECEIVED_COMMAND) {
-
-case 0b00110001:
-machine_state = 4;
-break;
-case 0b00110100:
-machine_state = 1;
-break;
-case 0b00110010:
-machine_state = 3;
-break;
-case 0b00110011:
-machine_state = 2;
 break;
 
+case 2:
+LATB1 = 0;
+LATB2 = 1;
+LATB3 = 0;
+LATB4 = 1;
+LATB5 = 0;
 
-case 0b00110101:
-set_current_fish(&current_fish, 6);
+if (RECEIVED_COMMAND == 0b00110100 || !PORTAbits.RA2){
+fsm_state = 0;
+} else if (RECEIVED_COMMAND == 0b00110011 && !PORTAbits.RA1){
+fsm_state = 3;
+} else if (RECEIVED_COMMAND == 0b00110001 && PORTAbits.RA2){
+fsm_state = 1;
+}
 break;
-case 0b00110110:
-set_current_fish(&current_fish, 2);
+
+case 3:
+LATB1 = 0;
+LATB2 = 0;
+LATB3 = 1;
+LATB4 = 0;
+LATB5 = 0;
+if (PORTAbits.RA1)
+T1CONbits.TMR1ON = 1;
+
+
+if (TMR1IF){
+if (t1_counter > 300){
+T1CONbits.TMR1ON = 0;
+t1_counter = 0;
+fsm_state = 0;
+} else {
+t1_counter ++;
+}
+TMR1H = (timer_preload >> 8 & 0xFF);
+TMR1L = (timer_preload & 0xFF);
+TMR1IF = 0;
+}
+
+if (RECEIVED_COMMAND == 0b00110100){
+fsm_state = 0;
+T1CONbits.TMR1ON = 0;
+} else if (RECEIVED_COMMAND == 0b00110010 && PORTAbits.RA2){
+fsm_state = 2;
+} else if (RECEIVED_COMMAND == 0b00110001 && PORTAbits.RA2){
+fsm_state = 1;
+}
 break;
-case 0b00110111:
-set_current_fish(&current_fish, 1);
-break;
-case 0b00111000:
-set_current_fish(&current_fish, 5);
-break;
-case 0b00111001:
-set_current_fish(&current_fish, 4);
-break;
-case 0b01000001:
-set_current_fish(&current_fish, 3);
-break;
+
+}
+
+
+if (fsm_state != last_fsm_state){
+EEPROM_write(0x10,fsm_state);
+last_fsm_state = fsm_state;
+}
+
+
+if (TMR0IF) {
+send_sys_data(fsm_state, current_fish.identifier, Temp_measured);
+TMR0IF = 0;
+TMR0H = (timer_preload >> 8 & 0xFF);
+TMR0L = (timer_preload & 0xFF);
 }
 RECEIVED_COMMAND = 0;
-}
-
-send_sys_data(machine_state, current_fish.identifier, Temp_measured);
-
-
-
 }
 }
 

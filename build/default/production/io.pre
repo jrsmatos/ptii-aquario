@@ -8861,16 +8861,9 @@ TXREG1 = c;
 
 void send_sys_data(char machine_state, char fish, float temperature) {
 
-
-char sys_state = 0;
-sys_state = PORTB;
-
-char sys_state_2 = 0;
-sys_state_2 = PORTA;
-
 putch(machine_state);
-putch(sys_state);
-putch(sys_state_2);
+putch(PORTB);
+putch(PORTA);
 putch(99);
 putch((int)(temperature*10)/10);
 putch((int)(temperature*10)%10);
